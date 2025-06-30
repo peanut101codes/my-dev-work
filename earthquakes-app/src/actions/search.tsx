@@ -12,20 +12,33 @@ type Earthquake = {
     };
 };
 
-let earthquakes: Earthquake[] = [];
+let earthquakes: Earthquake[] | null = null;
+let selectedParams: { startYear: string; endYear: string; minMagnitude: string; orderBy: string } = {
+    startYear: '',
+    endYear: '',
+    minMagnitude: '',
+    orderBy: ''
+};
 
-export const getEarthquakes = async (): Promise<Earthquake[]> => {
+export const getEarthquakes = async (): Promise<Earthquake[] | null> => {
   await new Promise((resolve) => setTimeout(resolve, 250));
   return Promise.resolve(earthquakes);
 };
+
+export const getSearchParams = async (): Promise<{ startYear: string; endYear: string; minMagnitude: string; orderBy: string }> => {
+   // await new Promise((resolve) => setTimeout(resolve, 250));
+    return Promise.resolve(selectedParams);
+}
 
 export async function searchEarthquakes(formData: FormData): Promise<void | { error: unknown }> {
     const startYear = formData.get('startYear') as string;
     const endYear = formData.get('endYear') as string;
     const minMagnitude = formData.get('minMagnitude') as string;
+    const orderBy = formData.get('orderby') as string || 'time-asc';
+    selectedParams = { startYear, endYear, minMagnitude, orderBy };
 
     const baseUrl = 'https://earthquake.usgs.gov/fdsnws/event/1/query';
-    const params = new URLSearchParams({ format: 'geojson', limit: '12', orderby: 'magnitude' });
+    const params = new URLSearchParams({ format: 'geojson', limit: '84' });
 
     if (startYear && String(startYear).trim() !== '') {
         params.append('starttime', `${startYear}-01-01`);
@@ -35,6 +48,9 @@ export async function searchEarthquakes(formData: FormData): Promise<void | { er
     }
     if (minMagnitude && String(minMagnitude).trim() !== '') {
         params.append('minmagnitude', minMagnitude);
+    }
+    if (orderBy && String(orderBy).trim() !== '') {
+        params.append('orderby', orderBy);
     }
 
     const url = `${baseUrl}?${params.toString()}`;
@@ -58,8 +74,8 @@ export async function searchEarthquakes(formData: FormData): Promise<void | { er
                     time: feature.properties.time,
                 },
             };
-            if (!earthquakes.some(eq => eq.id === earthquake.id)) {
-                earthquakes.push(earthquake);
+            if (!earthquakes?.some(eq => eq.id === earthquake.id)) {
+                earthquakes?.push(earthquake);
             }
         });
     } catch (error) {
