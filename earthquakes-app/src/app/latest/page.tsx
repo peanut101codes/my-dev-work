@@ -2,18 +2,28 @@
 import Cards from "@/components/cards";
 
 async function fetchEarthquakeData() {
-    const response = await fetch(
-        'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=12&orderby=time&minsig=600',
-        { cache: 'no-store' }
-    );
-    if (!response.ok) {
-        throw new Error('Failed to fetch earthquake data');
+    try {
+        const response = await fetch(
+            'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&limit=12&orderby=time&minsig=600'
+        );
+        if (!response.ok) {
+            throw new Error('Failed to fetch earthquake data');
+        }
+        return await response.json();
+    } catch (error) {
+        return { error: error };
     }
-    return await response.json();
 }
 
 export default async function Latest() {
     const data = await fetchEarthquakeData();
+    if(data.error) {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <p className="text-yellow-600">Error fetching data: {data.error.message}</p>
+            </div>
+        ); 
+    }
     const earthquakes = data.features || [];
 
     return (

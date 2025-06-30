@@ -25,8 +25,13 @@ export const getEarthquakes = async (): Promise<Earthquake[] | null> => {
   return Promise.resolve(earthquakes);
 };
 
+export const clearEarthquakes = async (): Promise<void> => {
+    earthquakes = null;
+    selectedParams = { startYear: '', endYear: '', minMagnitude: '', orderBy: '' };
+    revalidatePath('/');
+}
+
 export const getSearchParams = async (): Promise<{ startYear: string; endYear: string; minMagnitude: string; orderBy: string }> => {
-   // await new Promise((resolve) => setTimeout(resolve, 250));
     return Promise.resolve(selectedParams);
 }
 
@@ -56,7 +61,7 @@ export async function searchEarthquakes(formData: FormData): Promise<void | { er
     const url = `${baseUrl}?${params.toString()}`;
 
     try {
-        const response = await fetch(url, {cache: 'no-store'});
+        const response = await fetch(url);
         if (!response.ok) {
             throw new Error('Failed to search earthquake data');
         }

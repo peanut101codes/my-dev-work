@@ -1,6 +1,7 @@
 import SearchForm from "@/components/searchform";
 import { getEarthquakes, getSearchParams } from "@/actions/search";
 import Cards from "@/components/cards";
+import RevalidateButton from "@/components/revalidateButton";
 
 export default async function Home() {
   const earthquakes = await getEarthquakes();
@@ -12,8 +13,12 @@ export default async function Home() {
       style={{ minHeight: '100vh' }}
     >
       <main className="w-[min(1440px,100%-4rem)] mx-auto" style={{ padding: '2rem' }}>
-        <h1 className="text-5xl font-extrabold text-center text-red-600 drop-shadow-lg mb-8">
-          Did you feel <span className="text-6xl text-black italic">It&nbsp;?</span>
+        {(Array.isArray(earthquakes) && earthquakes.length > 0 
+          || (searchParams.startYear!=='' ||searchParams.endYear!=='' || searchParams.minMagnitude!=='' || searchParams.orderBy!==''))
+          && <RevalidateButton />
+        }
+        <h1 className="text-4xl font-extrabold text-center text-red-600 drop-shadow-lg mb-8">
+          Did you feel <span className="text-5xl text-black italic">It&nbsp;?</span>
         </h1>
         <SearchForm 
           searchParams={searchParams} 
