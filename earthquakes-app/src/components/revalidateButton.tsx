@@ -8,19 +8,14 @@ export default function RevalidateButton() {
         await clearEarthquakes();
         revalidatePath('/');
         }}
-        className="flex md:justify-center items-center mb-4"
+      className="flex flex-col gap-4 items-center"
     >
-    <div className="flex flex-col sm:flex-row items-start sm:items-center">
       <button
         type="submit"
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        className="px-4 py-2 bg-[#002984] text-white font-semibold rounded-md hover:bg-[#757de8] transition w-[320px] md:w-auto"
       >
-        Revalidate
+        Clear Search
       </button>
-      <span className="text-sm text-gray-600 mt-2 sm:mt-0 sm:ml-2">
-        Clear your search history cached by server
-      </span>
-    </div>
     </form>
   );
 }

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Button, Tooltip } from "@mui/material";
 
 interface EarthquakeDetail {
     id: string;
@@ -35,11 +36,19 @@ export default async function EarthquakeDetailPage({ params }: { params: Promise
 
     return (
         <main className="w-[min(960px,100%-4rem)] mx-auto" style={{ padding: '2rem' }}>                        
-            <h1 className="pt-8 pb-8 text-xl font-bold text-red-600">{detail.properties.title}</h1>
+            <h1 className="pt-8 pb-8 text-xl font-bold">{detail.properties.title}</h1>
             <ul className="space-y-4">
                 <li><strong>ID:</strong> {detail?.id}</li>
                 <li><strong>Magnitude:</strong> {detail.properties.mag}</li>
-                <li><strong>Significance:</strong> {detail.properties.sig}</li>
+                <li><strong>
+                        <Tooltip placement="top-end" title="significance = max(magnitude, PAGER alert) + &#39;Did you feel it?&#39;">
+                            <Button sx={{m:0, p:0}} variant="text">
+                                Significance:&nbsp;
+                            </Button>
+                        </Tooltip>
+                    </strong> 
+                    {detail.properties.sig}
+                </li>
                 <li><strong>Location:</strong> {detail.properties.place}</li>
                 <li>
                     <strong>Latitude:</strong>{" "}
@@ -60,7 +69,7 @@ export default async function EarthquakeDetailPage({ params }: { params: Promise
                 <li><strong>Tsunami:</strong> {detail.properties.tsunami == 0 ? "No" : "Yes"}</li>
                 <li><strong>Felt:</strong> {detail.properties.felt}</li>
                 <li><strong>Alert:</strong> {detail.properties.alert}</li>
-                <li><strong>Time:</strong> {new Date(detail.properties.time).toLocaleString()}</li>
+                <li><strong>Time UTC:</strong> {new Date(detail.properties.time).toLocaleString()}</li>
             </ul>
             <Link
                 href={"/"}

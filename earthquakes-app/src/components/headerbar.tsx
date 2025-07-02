@@ -8,7 +8,7 @@ import AdbIcon from '@mui/icons-material/Public';
 import Link from 'next/link';
 import MobileNav from './mobilenav';
 
-const pages = ['Latest'];
+const pages = ['About', 'Latest'];
 
 function ResponsiveAppBar() {
 
