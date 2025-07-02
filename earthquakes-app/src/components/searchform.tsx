@@ -31,6 +31,10 @@ export default function SearchForm({ searchParams }: SearchFormProps) {
     setInputMinMagnitude(e.target.value);
   };
 
+  const handleOrderByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setInputOrderBy(e.target.value);
+  };
+
   return (
         <form action={async (formData) => {
             const startYear = formData.get('startYear');
@@ -104,6 +108,7 @@ export default function SearchForm({ searchParams }: SearchFormProps) {
                 name="orderby"
                 className="flex-1 px-2 border border-red-400 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 bg-gray-300 mb-2 md:mb-0"
                 defaultValue={inputOrderBy}
+                onChange={handleOrderByChange}
                 >
                 <option value="">Order by ...</option>
                 <option value="time">Time (Newest)</option>
