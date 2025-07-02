@@ -17,7 +17,7 @@ export default async function Home() {
         <h1 className="text-4xl font-extrabold text-center text-red-600 drop-shadow-lg mb-8">
           Did you feel <span className="text-5xl text-black italic">It&nbsp;?</span>
         </h1>
-        <div className="flex flex-col gap-2 md:flex-row md:justify-center md:items-center mb-8">
+        <div className="flex flex-col gap-2 lg:flex-row lg:justify-center lg:items-center mb-8">
           <SearchForm 
             searchParams={searchParams} 
             key={searchParams.startYear + searchParams.endYear + searchParams.minMagnitude + searchParams.orderBy} 

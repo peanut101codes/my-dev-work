@@ -5,12 +5,15 @@ export default function SearchButton() {
     const { pending } = useFormStatus();
 
     return (
-        <button
-            disabled={pending}
-            className="px-4 py-2 bg-[#002984] text-white font-semibold rounded-md hover:bg-[#757de8] transition md:w-[135px]"
-            type="submit"
-        >
-            {pending ? 'Searching...' : 'Search'}
-        </button>
+        <div className="flex justify-center">
+            <button
+                disabled={pending}
+                className="px-4 py-2 bg-blue-900 text-white font-semibold rounded-md hover:bg-blue-300 transition-colors 
+                min-w-[284px] sm:min-w-[320px] lg:w-auto lg:min-w-0 lg:max-w-40"
+                type="submit"
+            >
+                {pending ? 'Searching...' : 'Search'}
+            </button>
+        </div>
     );
 }

@@ -28,7 +28,7 @@ if (!earthquakes || earthquakes.length === 0) {
 }
 
   return (
-    <Box sx={{ maxWidth: 320, flexGrow: 1, alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+    <Box sx={{ maxWidth: 286, flexGrow: 1, alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
       <Card eq={earthquakes[activeStep]} />
       <MobileStepper
         variant="text"

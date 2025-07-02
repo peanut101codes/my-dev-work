@@ -17,7 +17,7 @@ export default function Card({ eq }: { eq: Earthquake }) {
     }
     return (
         <div
-            className="border border-gray-300 rounded-lg p-4 w-[320px] md:w-[280px] xl:w-[310px] bg-gray-50 shadow-lg hover:shadow-2xl transition-shadow duration-200 flex flex-col gap-2"
+            className="border border-gray-300 rounded-lg p-4 w-[286px] md:w-[320px] bg-gray-50 shadow-lg hover:shadow-2xl transition-shadow duration-200 flex flex-col gap-2"
             style={{
                 boxShadow:
                     "0 4px 16px rgba(0,0,0,0.10), 0 1.5px 6px rgba(0,0,0,0.08)",
