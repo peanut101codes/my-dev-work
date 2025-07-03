@@ -95,7 +95,7 @@ export default function SearchForm({ searchParams }: SearchFormProps) {
               type="number"
               min="0"
               max="9"
-              step="0.5"
+              step="0.1"
               placeholder={searchParams.minMagnitude || "Min magnitude"}
               required={!searchParams.minMagnitude}
               value={inputMinMagnitude}
