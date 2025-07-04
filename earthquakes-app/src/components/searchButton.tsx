@@ -9,7 +9,7 @@ export default function SearchButton() {
             <button
                 disabled={pending}
                 className="px-4 py-2 bg-blue-900 text-white font-semibold rounded-md hover:bg-blue-300 transition-colors 
-                min-w-[250px] sm:min-w-[320px] lg:w-auto lg:min-w-0 lg:max-w-40"
+                min-w-[270px] sm:min-w-[320px] lg:w-auto lg:min-w-0 lg:max-w-40"
                 type="submit"
             >
                 {pending ? 'Searching...' : 'Search'}
