@@ -8,7 +8,7 @@ import AdbIcon from '@mui/icons-material/Public';
 import Link from 'next/link';
 import MobileNav from './mobilenav';
 
-const pages = ['About', 'Latest'];
+const pages = ['Home', 'About', 'Latest'];
 
 function ResponsiveAppBar() {
 
@@ -44,10 +44,10 @@ function ResponsiveAppBar() {
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 <Link
-                  href={`/${page.toLowerCase()}`}
+                  href={page.toLowerCase() === 'home' ? '/' : `/${page.toLowerCase()}`}
                   className="text-white hover:underline inline-block"
                 >
-                    {page}
+                  {page}
                 </Link>
               </Button>
             ))}

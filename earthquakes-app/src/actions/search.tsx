@@ -86,6 +86,5 @@ export async function searchEarthquakes(formData: FormData): Promise<void | { er
     } catch (error) {
         return { error: error };
     }
-    await new Promise((resolve) => setTimeout(resolve, 300));
     revalidatePath('/');
 } 

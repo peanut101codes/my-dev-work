@@ -1,8 +1,8 @@
 import SearchForm from "@/components/searchform";
 import { getEarthquakes, getSearchParams } from "@/actions/search";
 import Cards from "@/components/cards";
-import RevalidateButton from "@/components/revalidateButton";
 import MobileCards from "@/components/mobileCards";
+import RevalidateButton from "@/components/revalidateButton";
 
 export default async function Home() {
   const earthquakes = await getEarthquakes();
@@ -37,7 +37,7 @@ export default async function Home() {
             </div>
           </>
         ) : earthquakes && Array.isArray(earthquakes) && earthquakes.length === 0 ? (
-          <div className="text-center text-gray-800 mt-8 text-xl">No data found</div>
+          <div className="text-center bg-gray-300 mt-8 text-xl">No data found. Try lower your min magnitude.</div>
         ) : null}
       </main>
     </div>

@@ -1,23 +1,23 @@
+'use client';
+
+import FormSubmitButton from './formButton';
 import { clearEarthquakes } from '@/actions/search';
-import { revalidatePath } from 'next/cache';
+
 
 export default function RevalidateButton() {
   return (
     <form action={async () => {
-        'use server';
         await clearEarthquakes();
-        revalidatePath('/');
-        }}
+      }}
       className="flex flex-col gap-4 items-center"
     >
-      <button
-        type="submit"
-        className="px-4 py-2 bg-[#002984] text-white font-semibold rounded-md hover:bg-[#757de8] transition
-        min-w-[284px] sm:min-w-[320px] lg:w-auto lg:min-w-0 lg:max-w-40"
+      <div className="flex gap-2 flex-col lg:flex-row w-full max-w-xs lg:max-w-3xl">
+        <FormSubmitButton
+          idleText="Clear Search"
+          pendingText="Clearing..."
+        />
+      </div>
 
-      >
-        Clear Search
-      </button>
     </form>
   );
 }

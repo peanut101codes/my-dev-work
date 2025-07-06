@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { searchEarthquakes } from "@/actions/search";
-import SearchButton from "./searchButton";
+import FormSubmitButton from './formButton';
 
 export interface SearchFormProps {
   searchParams: {
@@ -19,44 +19,13 @@ export default function SearchForm({ searchParams }: SearchFormProps) {
   const [inputMinMagnitude, setInputMinMagnitude] = useState(searchParams.minMagnitude || ''); 
   const [inputOrderBy, setInputOrderBy] = useState(searchParams.orderBy || 'time-asc');
 
-  const handleStartYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputStartYear(e.target.value);
-  };
-
-  const handleEndYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputEndYear(e.target.value);
-  };
-
-  const handleMinMagnitudeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputMinMagnitude(e.target.value);
-  };
-
-  const handleOrderByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setInputOrderBy(e.target.value);
-  };
-
   return (
         <form action={async (formData) => {
-            const startYear = formData.get('startYear');
-            if (!startYear || isNaN(Number(startYear))) {
-              const input = document.querySelector('input[name="startYear"]') as HTMLInputElement | null;
-              if (input) {
-                formData.set('startYear', input.placeholder);
-              }
-            }
-            const endYear = formData.get('endYear');
-            if (!endYear || isNaN(Number(endYear))) {
-              const input = document.querySelector('input[name="endYear"]') as HTMLInputElement | null;
-              if (input) {
-                formData.set('endYear', input.placeholder);
-              }
-            }
-            const minMagnitude = formData.get('minMagnitude');
-            if (!minMagnitude || isNaN(Number(minMagnitude))) {
-              const input = document.querySelector('input[name="minMagnitude"]') as HTMLInputElement | null;
-              if (input) {
-                formData.set('minMagnitude', input.placeholder);
-              }
+            const startYear = Number(formData.get('startYear'));
+            const endYear = Number(formData.get('endYear'));
+            if (endYear < startYear) {
+              alert('End-year cannot be earlier than start-year.');
+              return;
             }
             const result = await searchEarthquakes(formData);
             if (result && result.error) {
@@ -74,7 +43,7 @@ export default function SearchForm({ searchParams }: SearchFormProps) {
               placeholder={searchParams.startYear || "Start year"}
               required={!searchParams.startYear}
               value={inputStartYear}
-              onChange={handleStartYearChange}
+              onChange={(event) => setInputStartYear(event.target.value)}
               className="px-2 border border-red-400 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 bg-gray-300"
               style={{ minWidth: '110px' }}
               />
@@ -86,7 +55,7 @@ export default function SearchForm({ searchParams }: SearchFormProps) {
               placeholder={searchParams.endYear || "End year"}
               required={!searchParams.endYear}
               value={inputEndYear}
-              onChange={handleEndYearChange}
+              onChange={(event) => setInputEndYear(event.target.value)}
               className="px-2 border border-red-400 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 bg-gray-300"
               style={{ minWidth: '110px' }}
               />
@@ -99,15 +68,15 @@ export default function SearchForm({ searchParams }: SearchFormProps) {
               placeholder={searchParams.minMagnitude || "Min magnitude"}
               required={!searchParams.minMagnitude}
               value={inputMinMagnitude}
-              onChange={handleMinMagnitudeChange}
+              onChange={(event) => setInputMinMagnitude(event.target.value)}
               className="flex-1 px-2 border border-red-400 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 bg-gray-300"
               style={{ minWidth: '150px' }}
               />
               <select
               name="orderby"
               className="flex-1 px-2 border border-red-400 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 bg-gray-300 mb-2 md:mb-0"
-              defaultValue={inputOrderBy}
-              onChange={handleOrderByChange}
+              value={inputOrderBy}
+              onChange={(event) => setInputOrderBy(event.target.value)}
               >
               <option value="">Order by ...</option>
               <option value="time">Time (Newest)</option>
@@ -115,7 +84,10 @@ export default function SearchForm({ searchParams }: SearchFormProps) {
               <option value="magnitude">Magnitude (Highest)</option>
               <option value="magnitude-asc">Magnitude (Lowest)</option>
               </select>
-              <SearchButton />
+              <FormSubmitButton
+                  idleText="Search"
+                  pendingText="Searching..."
+              />
             </div>
         </form>
   );

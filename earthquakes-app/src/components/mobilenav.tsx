@@ -56,24 +56,16 @@ function MobileNav({ pages }: MobileNavProps) {
           onClose={handleCloseNavMenu}
           sx={{ display: { xs: 'block', md: 'none' } }}
         >
-          <MenuItem onClick={handleCloseNavMenu}>
-                <Link
-                  href="/"
-                  className="text-black hover:underline inline-flex items-center"
-                  style={{ display: 'flex', alignItems: 'center' }}
-                >
-                  <HomeIcon sx={{ mr: 1 }} />
-                  <Typography sx={{ textAlign: 'center' }}>Home</Typography>
-                </Link>
-            </MenuItem>
           {pages.map((page) => (
             <MenuItem key={page} onClick={handleCloseNavMenu}>
                 <Link
-                    href={`/${page.toLowerCase()}`}
+                    href={page.toLowerCase() === 'home' ? '/' : `/${page.toLowerCase()}`}
                     className="text-black hover:underline inline-block"
                     style={{ display: 'flex', alignItems: 'center' }}
                 >
-                    {page.toLowerCase() === 'about' ? (
+                    {page.toLowerCase() === 'home' ? (
+                      <HomeIcon sx={{ mr: 1 }} />
+                    ) : page.toLowerCase() === 'about' ? (
                       <AboutIcon sx={{ mr: 1 }} />
                     ) : (
                       <PageIcon sx={{ mr: 1 }} />
