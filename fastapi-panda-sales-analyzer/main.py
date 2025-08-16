@@ -12,7 +12,7 @@ from datetime import datetime
 app = FastAPI(title='Sales Analyzer')
 
 BASE_DIR = os.path.dirname(__file__)
-DATA_FILE = os.path.join(BASE_DIR, 'data', 'sample_data.csv')
+DATA_FILE = os.getenv('DATA_FILE', os.path.join(BASE_DIR, 'data', 'sample_data.csv'))
 
 app.mount('/static', StaticFiles(directory=os.path.join(BASE_DIR, 'static')), name='static')
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, 'templates'))
@@ -233,6 +233,12 @@ async def api_post_data_validated(record: AddRecordModel):
     payload = record.dict(exclude_none=True)
     new_id = service.add_record(payload)
     return {'id': new_id}
+
+
+@app.get('/health')
+async def health():
+    """Simple health check for load balancers / Cloud Run readiness."""
+    return {"status": "ok"}
 
 
 if __name__ == '__main__':

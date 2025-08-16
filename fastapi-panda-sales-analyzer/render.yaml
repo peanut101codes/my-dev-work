@@ -1,0 +1,14 @@
+# Render service manifest (for Render static + web services)
+# See https://render.com/docs/deploy-a-docker-container
+services:
+  - type: web
+    name: sales-analyzer
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    branch: main
+    autoDeploy: true
+    instances: 1
+    envVars:
+      - key: DATA_FILE
+        value: /data/sample_data.csv
