@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Data Cleaning</title>
+  <link href="/static/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>Data Cleaning Tools</h1>
+    <section>
+      <h2>Find Duplicates</h2>
+      <form method="get" action="/data_cleaning/duplicates">
+        <label>Columns (comma separated): <input name="columns"></label>
+        <button type="submit">Find</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Drop Duplicates</h2>
+      <form method="post" action="/data_cleaning/drop_duplicates">
+        <label>Columns (comma separated): <input name="columns"></label>
+        <button type="submit">Drop</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Fill Missing</h2>
+      <form method="post" action="/data_cleaning/fill_missing">
+        <label>Column: <input name="column" required></label>
+        <label>Value: <input name="value"></label>
+        <button type="submit">Fill</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>Coerce Column Type</h2>
+      <form method="post" action="/data_cleaning/coerce">
+        <label>Column: <input name="column" required></label>
+        <label>Type (int/float/datetime/str): <input name="dtype" required></label>
+        <button type="submit">Coerce</button>
+      </form>
+    </section>
+
+    {% if duplicates %}
+    <section>
+      <h2>Duplicate Rows</h2>
+      <table>
+        <thead>
+          <tr>
+            {% for col in duplicates[0].keys() %}
+            <th>{{ col }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in duplicates %}
+          <tr>
+            {% for v in r.values() %}
+            <td>{{ v }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    {% endif %}
+
+  </div>
+</body>
+</html>

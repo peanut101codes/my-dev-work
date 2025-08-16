@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sales Analyzer</title>
+  <link href="/static/styles.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Sales Analyzer Dashboard</h1>
+    <p>Rows: {{ summary.rows }} | Columns: {{ summary.columns | join(', ') }}</p>
+
+    <a href="/add">Add Record</a>
+    <div style="display:flex; gap:1rem; margin-top:1rem;">
+      <canvas id="productlineChart" width="400" height="200"></canvas>
+      <canvas id="salesTimeChart" width="400" height="200"></canvas>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+        {% for col in rows[0].keys() %}
+          <th>{{ col }}</th>
+        {% endfor %}
+        <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          {% for v in r.values() %}
+          <td>{{ v }}</td>
+          {% endfor %}
+          <td><a href="/edit/{{ r.id }}">Edit</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+<script>
+async function loadCharts(){
+  try{
+    const resp1 = await fetch('/api/chart/productline');
+    const data1 = await resp1.json();
+    const ctx1 = document.getElementById('productlineChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'pie',
+      data: {
+        labels: data1.labels,
+        datasets: [{ data: data1.values, backgroundColor: ['#4f46e5','#06b6d4','#f97316','#10b981','#ef4444','#f59e0b'] }]
+      }
+    });
+
+    const resp2 = await fetch('/api/chart/sales_over_time');
+    const data2 = await resp2.json();
+    const ctx2 = document.getElementById('salesTimeChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: data2.labels,
+        datasets: [{ label: 'Sales', data: data2.values, borderColor: '#111827', backgroundColor: 'rgba(17,24,39,0.05)' }]
+      },
+      options: { scales: { x: { display: true }, y: { display: true } } }
+    });
+  }catch(e){
+    console.error('Failed to load charts', e);
+  }
+}
+window.addEventListener('load', loadCharts);
+</script>
+</body>
+</html>

@@ -37,7 +37,7 @@ A full-stack Python web application for sales data analysis and management, buil
 ## Tech Stack
 
 - **Backend**: FastAPI, Uvicorn
-- **Frontend**: Jinja2 templates, Bootstrap 5, Chart.js
+- **Frontend**: Jinja2 templates, Tailwind, Chart.js
 - **Data Processing**: Pandas, NumPy
 - **Data Storage**: CSV files (easily replaceable with database)
 
