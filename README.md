@@ -15,7 +15,7 @@
 - Source code: [FastAPI pandas Sales Analyzer](./fastapi-panda-sales-analyzer) — A project built with FastAPI (Python web framework), pandas (data analysis library), and Jinja (templating engine) for exploring and analyzing sales CSV data.
 - See `fastapi-panda-sales-analyzer/README.md` for project structure, setup, usage, and examples.
 - Vibe Coding: Used GPT-5 mini (Preview) Agent to generate the entire application, per instruction file `fastapi-panda-sales-analyzer/.github/copilot-instructions.md`.
-- **Vibe Coding Issues:** Some features (e.g. data-cleaning frontend page) listed in instruction are not generated; Adding-record does not reflect all the fields; UI needs enhancements, etc. I will fix those in the coming future. 
+- **Vibe Coding Issues:** Some features (e.g. data-cleaning frontend page) listed in instruction are not generated; Adding-record does not reflect all the fields; UI needs enhancements, etc. I will fix those in the coming future. | Update (11/20/25)-Fixed
 
 - ## Technology Stacks
 
