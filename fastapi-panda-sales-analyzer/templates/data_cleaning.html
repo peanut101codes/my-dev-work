@@ -1,72 +1,376 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Data Cleaning</title>
-  <link href="/static/styles.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automobile Data Cleaning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#667eea',
+                        'secondary': '#764ba2'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-  <div class="container">
-    <h1>Data Cleaning Tools</h1>
-    <section>
-      <h2>Find Duplicates</h2>
-      <form method="get" action="/data_cleaning/duplicates">
-        <label>Columns (comma separated): <input name="columns"></label>
-        <button type="submit">Find</button>
-      </form>
-    </section>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-primary to-secondary shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/" class="flex items-center text-white text-xl font-bold hover:text-gray-200 transition duration-200">
+                    <i class="fas fa-car mr-2"></i>
+                    Automobile Sales Analytics
+                </a>
+                <div class="flex space-x-6">
+                    <a href="/" class="text-white hover:text-gray-200 flex items-center transition duration-200">
+                        <i class="fas fa-home mr-1"></i>
+                        Home
+                    </a>
+                    <a href="/add" class="text-white hover:text-gray-200 flex items-center transition duration-200">
+                        <i class="fas fa-plus mr-1"></i>
+                        Add Record
+                    </a>
+                    <a href="/data_cleaning" class="bg-white bg-opacity-20 text-white px-3 py-2 rounded-md flex items-center transition duration-200 hover:bg-opacity-30">
+                        <i class="fas fa-broom mr-1"></i>
+                        Data Cleaning
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <section>
-      <h2>Drop Duplicates</h2>
-      <form method="post" action="/data_cleaning/drop_duplicates">
-        <label>Columns (comma separated): <input name="columns"></label>
-        <button type="submit">Drop</button>
-      </form>
-    </section>
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 flex items-center justify-center">
+                <i class="fas fa-broom mr-3 text-primary"></i>
+                Automobile Sales Data Cleaning Tools
+            </h1>
+        </div>
 
-    <section>
-      <h2>Fill Missing</h2>
-      <form method="post" action="/data_cleaning/fill_missing">
-        <label>Column: <input name="column" required></label>
-        <label>Value: <input name="value"></label>
-        <button type="submit">Fill</button>
-      </form>
-    </section>
+        <!-- Data Quality Overview -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Data Quality Issues -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 transform hover:shadow-xl transition duration-300">
+                <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-2 text-yellow-500"></i>
+                    Data Quality Issues
+                </h4>
+                
+                <div class="mb-4">
+                    <h6 class="font-semibold text-gray-700 mb-2">Missing Values:</h6>
+                    {% if cleaning_info.missing_values %}
+                        <div class="space-y-2">
+                            {% for column, count in cleaning_info.missing_values.items() %}
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span class="text-gray-700">{{ column }}</span>
+                                <span class="{% if count > 0 %}bg-red-500{% else %}bg-green-500{% endif %} text-white px-2 py-1 rounded-full text-sm">
+                                    {{ count }}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-green-600 flex items-center">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            No missing values detected!
+                        </p>
+                    {% endif %}
+                </div>
 
-    <section>
-      <h2>Coerce Column Type</h2>
-      <form method="post" action="/data_cleaning/coerce">
-        <label>Column: <input name="column" required></label>
-        <label>Type (int/float/datetime/str): <input name="dtype" required></label>
-        <button type="submit">Coerce</button>
-      </form>
-    </section>
+                <div>
+                    <h6 class="font-semibold text-gray-700 mb-2">Duplicate Records:</h6>
+                    <p class="{% if cleaning_info.duplicates > 0 %}text-red-600{% else %}text-green-600{% endif %} flex items-center">
+                        <i class="fas fa-copy mr-2"></i>
+                        {{ cleaning_info.duplicates }} duplicate record(s) found
+                    </p>
+                </div>
+            </div>
 
-    {% if duplicates %}
-    <section>
-      <h2>Duplicate Rows</h2>
-      <table>
-        <thead>
-          <tr>
-            {% for col in duplicates[0].keys() %}
-            <th>{{ col }}</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in duplicates %}
-          <tr>
-            {% for v in r.values() %}
-            <td>{{ v }}</td>
-            {% endfor %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </section>
-    {% endif %}
+            <!-- Data Types -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 transform hover:shadow-xl transition duration-300">
+                <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                    Data Types
+                </h4>
+                
+                <div class="space-y-2">
+                    {% for column, dtype in cleaning_info.data_types.items() %}
+                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                        <span class="text-gray-700">{{ column }}</span>
+                        <span class="bg-gray-500 text-white px-2 py-1 rounded-full text-sm">{{ dtype }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
 
-  </div>
+        <!-- Cleaning Actions -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 transform hover:shadow-xl transition duration-300">
+            <h4 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-tools mr-2 text-gray-600"></i>
+                Cleaning Actions
+            </h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="removeDuplicates()" 
+                        class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
+                    <i class="fas fa-trash-alt mr-2"></i>Remove Duplicates
+                </button>
+                <button onclick="fillMissingValues()" 
+                        class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
+                    <i class="fas fa-fill-drip mr-2"></i>Fill Missing Values
+                </button>
+                <button onclick="validateData()" 
+                        class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
+                    <i class="fas fa-check-circle mr-2"></i>Validate Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Data Preview -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 transform hover:shadow-xl transition duration-300">
+            <h4 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-table mr-2 text-gray-600"></i>
+                Data Preview
+            </h4>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <thead class="bg-gradient-to-r from-primary to-secondary text-white">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-semibold">Order #</th>
+                            <th class="px-4 py-3 text-left font-semibold">Customer</th>
+                            <th class="px-4 py-3 text-left font-semibold">Product Line</th>
+                            <th class="px-4 py-3 text-left font-semibold">Quantity</th>
+                            <th class="px-4 py-3 text-left font-semibold">Price Each</th>
+                            <th class="px-4 py-3 text-left font-semibold">Total Sales</th>
+                            <th class="px-4 py-3 text-left font-semibold">Status</th>
+                            <th class="px-4 py-3 text-left font-semibold">Country</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        {% for record in cleaning_info.sample_data %}
+                        <tr class="border-b hover:bg-gray-50 transition duration-200">
+                            <td class="px-4 py-3">{{ record.ORDERNUMBER or '<span class="text-red-500">NULL</span>' | safe }}</td>
+                            <td class="px-4 py-3">{{ record.CUSTOMERNAME or '<span class="text-red-500">NULL</span>' | safe }}</td>
+                            <td class="px-4 py-3">{{ record.PRODUCTLINE or '<span class="text-red-500">NULL</span>' | safe }}</td>
+                            <td class="px-4 py-3">{{ record.QUANTITYORDERED or '<span class="text-red-500">NULL</span>' | safe }}</td>
+                            <td class="px-4 py-3">{{ '${:,.2f}'.format(record.PRICEEACH) if record.PRICEEACH else '<span class="text-red-500">NULL</span>' | safe }}</td>
+                            <td class="px-4 py-3">{{ '${:,.2f}'.format(record.SALES) if record.SALES else '<span class="text-red-500">NULL</span>' | safe }}</td>
+                            <td class="px-4 py-3">{{ record.STATUS or '<span class="text-red-500">NULL</span>' | safe }}</td>
+                            <td class="px-4 py-3">{{ record.COUNTRY or '<span class="text-red-500">NULL</span>' | safe }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Data Filters and Search -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 transform hover:shadow-xl transition duration-300">
+            <h4 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-filter mr-2 text-gray-600"></i>
+                Data Filters
+            </h4>
+            
+            <form id="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Position:</label>
+                    <select id="position" name="position" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                        <option value="top">Top Records</option>
+                        <option value="bottom">Bottom Records</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Limit:</label>
+                    <input type="number" id="limit" name="limit" value="10" min="1" max="100" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Product Line:</label>
+                    <select id="productline_filter" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                        <option value="">All Product Lines</option>
+                        <option value="Motorcycles">Motorcycles</option>
+                        <option value="Classic Cars">Classic Cars</option>
+                        <option value="Trucks">Trucks</option>
+                        <option value="Vintage Cars">Vintage Cars</option>
+                        <option value="Planes">Planes</option>
+                        <option value="Ships">Ships</option>
+                        <option value="Trains">Trains</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">&nbsp;</label>
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-primary to-secondary hover:from-blue-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center">
+                        <i class="fas fa-search mr-2"></i>Apply Filter
+                    </button>
+                </div>
+            </form>
+            
+            <div id="filteredResults" class="mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="resultsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-2xl bg-white">
+            <div class="flex items-center justify-between p-4 border-b">
+                <h5 class="text-xl font-bold text-gray-800">Cleaning Results</h5>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">×</button>
+            </div>
+            <div class="p-6" id="modalContent">
+                <!-- Results will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functions
+        function showModal() {
+            document.getElementById('resultsModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('resultsModal').classList.add('hidden');
+        }
+
+        // Filter form submission
+        document.getElementById('filterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const position = document.getElementById('position').value;
+            const limit = document.getElementById('limit').value;
+            
+            try {
+                const response = await fetch(`/api/data?position=${position}&limit=${limit}`);
+                const data = await response.json();
+                
+                displayFilteredResults(data);
+            } catch (error) {
+                alert('Error filtering data: ' + error.message);
+            }
+        });
+
+        function displayFilteredResults(data) {
+            const resultsDiv = document.getElementById('filteredResults');
+            
+            let html = `
+                <h6 class="text-lg font-semibold text-gray-800 mb-4">Filtered Results (${data.position} ${data.limit} records)</h6>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full table-auto bg-white rounded-lg shadow">
+                        <thead class="bg-gradient-to-r from-primary to-secondary text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-left font-semibold">Order #</th>
+                                <th class="px-4 py-3 text-left font-semibold">Customer</th>
+                                <th class="px-4 py-3 text-left font-semibold">Product Line</th>
+                                <th class="px-4 py-3 text-left font-semibold">Quantity</th>
+                                <th class="px-4 py-3 text-left font-semibold">Price Each</th>
+                                <th class="px-4 py-3 text-left font-semibold">Total Sales</th>
+                                <th class="px-4 py-3 text-left font-semibold">Status</th>
+                                <th class="px-4 py-3 text-left font-semibold">Country</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            data.data.forEach(record => {
+                html += `
+                    <tr class="border-b hover:bg-gray-50 transition duration-200">
+                        <td class="px-4 py-3">${record.ORDERNUMBER}</td>
+                        <td class="px-4 py-3">${record.CUSTOMERNAME}</td>
+                        <td class="px-4 py-3">${record.PRODUCTLINE}</td>
+                        <td class="px-4 py-3">${record.QUANTITYORDERED}</td>
+                        <td class="px-4 py-3">$${record.PRICEEACH.toFixed(2)}</td>
+                        <td class="px-4 py-3">$${record.SALES.toFixed(2)}</td>
+                        <td class="px-4 py-3">${record.STATUS}</td>
+                        <td class="px-4 py-3">${record.COUNTRY}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div>';
+            resultsDiv.innerHTML = html;
+        }
+
+        // Cleaning functions
+        function removeDuplicates() {
+            document.getElementById('modalContent').innerHTML = `
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                    <div class="flex">
+                        <i class="fas fa-info-circle text-blue-400 mr-2 mt-1"></i>
+                        <div>
+                            <h3 class="text-lg font-semibold text-blue-800 mb-2">Duplicate Removal</h3>
+                            <p class="text-blue-700">
+                                Duplicate removal functionality would be implemented here. 
+                                This would identify and remove duplicate automobile records based on key fields like Order Number.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function fillMissingValues() {
+            document.getElementById('modalContent').innerHTML = `
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                    <div class="flex">
+                        <i class="fas fa-info-circle text-blue-400 mr-2 mt-1"></i>
+                        <div>
+                            <h3 class="text-lg font-semibold text-blue-800 mb-2">Missing Value Imputation</h3>
+                            <p class="text-blue-700 mb-3">Missing value imputation would be implemented here. Options include:</p>
+                            <ul class="list-disc list-inside text-blue-700 space-y-1">
+                                <li>Fill with mean/median for numeric columns (Price, Quantity, Sales)</li>
+                                <li>Fill with mode for categorical columns (Product Line, Status, Country)</li>
+                                <li>Forward/backward fill for temporal data</li>
+                                <li>Remove rows with critical missing values</li>
+                                <li>Use predictive modeling for intelligent imputation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            showModal();
+        }
+
+        function validateData() {
+            document.getElementById('modalContent').innerHTML = `
+                <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded">
+                    <div class="flex">
+                        <i class="fas fa-check-circle text-green-400 mr-2 mt-1"></i>
+                        <div>
+                            <h3 class="text-lg font-semibold text-green-800 mb-2">Data Validation Complete</h3>
+                            <p class="text-green-700 mb-3">Automobile sales data validation successful!</p>
+                            <ul class="list-disc list-inside text-green-700 space-y-1">
+                                <li>Order numbers are unique and within valid range</li>
+                                <li>Price and sales values are positive</li>
+                                <li>Product lines are from valid automobile categories</li>
+                                <li>Order quantities are positive integers</li>
+                                <li>Status values are from approved list</li>
+                                <li>Country codes are valid</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            showModal();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('resultsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>
