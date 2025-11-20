@@ -1,75 +1,380 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sales Analyzer</title>
-  <link href="/static/styles.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automobile Sales Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            500: '#667eea',
+                            600: '#764ba2',
+                            700: '#5a67d8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-  <div class="container">
-    <h1>Sales Analyzer Dashboard</h1>
-    <p>Rows: {{ summary.rows }} | Columns: {{ summary.columns | join(', ') }}</p>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="/" class="flex items-center text-xl font-bold">
+                    <i class="fas fa-car mr-2"></i>Automobile Sales Dashboard
+                </a>
+                <div class="flex space-x-6">
+                    <a href="/" class="flex items-center hover:text-blue-200 transition-colors">
+                        <i class="fas fa-home mr-1"></i>Home
+                    </a>
+                    <a href="/add" class="flex items-center hover:text-blue-200 transition-colors">
+                        <i class="fas fa-plus mr-1"></i>Add Record
+                    </a>
+                    <a href="/data_cleaning" class="flex items-center hover:text-blue-200 transition-colors">
+                        <i class="fas fa-broom mr-1"></i>Data Cleaning
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-    <a href="/add">Add Record</a>
-    <div style="display:flex; gap:1rem; margin-top:1rem;">
-      <canvas id="productlineChart" width="400" height="200"></canvas>
-      <canvas id="salesTimeChart" width="400" height="200"></canvas>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-car mr-3 text-primary-500"></i>Automobile Sales Analytics Dashboard
+            </h1>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-primary-500 to-primary-600 text-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                <i class="fas fa-shopping-cart text-3xl mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">{{ stats.total_records }}</h3>
+                <p class="text-blue-100">Total Orders</p>
+            </div>
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                <i class="fas fa-dollar-sign text-3xl mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">${{ "{:,.0f}".format(stats.total_sales) }}</h3>
+                <p class="text-green-100">Total Sales</p>
+            </div>
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                <i class="fas fa-chart-bar text-3xl mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">${{ "{:,.0f}".format(stats.avg_order_value) }}</h3>
+                <p class="text-purple-100">Avg Order Value</p>
+            </div>
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                <i class="fas fa-boxes text-3xl mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">{{ stats.product_line_counts.keys()|length }}</h3>
+                <p class="text-orange-100">Product Lines</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-4 mb-8">
+            <a href="/add" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-full transition-colors shadow-lg hover:shadow-xl">
+                <i class="fas fa-plus mr-2"></i>Add New Record
+            </a>
+            <a href="/data_cleaning" class="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 px-6 rounded-full transition-colors shadow-lg hover:shadow-xl">
+                <i class="fas fa-broom mr-2"></i>Clean Data
+            </a>
+            <button onclick="analyzeData()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full transition-colors shadow-lg hover:shadow-xl">
+                <i class="fas fa-chart-line mr-2"></i>Analyze Dataset
+            </button>
+        </div>
+
+        <!-- Sales Trends - Full Width -->
+        <div class="mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h4 class="text-xl font-bold text-gray-700 mb-4 pb-3 border-b-2 border-gray-200 flex items-center">
+                    <i class="fas fa-line-chart mr-3 text-primary-500"></i>Sales Trends Over Time
+                </h4>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 relative">
+                    <!-- Loading Indicator -->
+                    <div id="sales-trends-loader" class="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-xl z-10">
+                        <div class="flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                            <p class="text-gray-600 mt-3 text-sm">Loading sales trends chart...</p>
+                        </div>
+                    </div>
+                    <img src="/api/charts/sales-trends" 
+                         class="w-full rounded-lg shadow-sm opacity-0 transition-opacity duration-300" 
+                         alt="Sales Trends Chart" 
+                         style="min-height: 400px; max-height: 600px;"
+                         onload="hideLoader('sales-trends-loader'); this.style.opacity='1';"
+                         onerror="showErrorMessage('sales-trends-loader', 'Failed to load sales trends chart')">
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Line Analysis - Full Width -->
+        <div class="mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h4 class="text-xl font-bold text-gray-700 mb-4 pb-3 border-b-2 border-gray-200 flex items-center">
+                    <i class="fas fa-boxes mr-3 text-primary-500"></i>Product Line Analysis
+                </h4>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 relative">
+                    <!-- Loading Indicator -->
+                    <div id="product-analysis-loader" class="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-xl z-10">
+                        <div class="flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                            <p class="text-gray-600 mt-3 text-sm">Loading product analysis chart...</p>
+                        </div>
+                    </div>
+                    <img src="/api/charts/product-analysis" 
+                         class="w-full rounded-lg shadow-sm opacity-0 transition-opacity duration-300" 
+                         alt="Product Analysis Chart" 
+                         style="min-height: 600px; max-height: 800px;"
+                         onload="hideLoader('product-analysis-loader'); this.style.opacity='1';"
+                         onerror="showErrorMessage('product-analysis-loader', 'Failed to load product analysis chart')">
+                </div>
+            </div>
+        </div>
+
+        <!-- Geographic and Order Status Analysis - Full Width for Better Readability -->
+        <div class="mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h4 class="text-xl font-bold text-gray-700 mb-4 pb-3 border-b-2 border-gray-200 flex items-center">
+                    <i class="fas fa-globe mr-3 text-primary-500"></i>Geographic Sales Analysis
+                </h4>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 relative">
+                    <!-- Loading Indicator -->
+                    <div id="geographic-analysis-loader" class="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-xl z-10">
+                        <div class="flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                            <p class="text-gray-600 mt-3 text-sm">Loading geographic analysis chart...</p>
+                        </div>
+                    </div>
+                    <img src="/api/charts/geographic-analysis" 
+                         class="w-full rounded-lg shadow-sm opacity-0 transition-opacity duration-300" 
+                         alt="Geographic Analysis Chart" 
+                         style="min-height: 600px; max-height: 800px;"
+                         onload="hideLoader('geographic-analysis-loader'); this.style.opacity='1';"
+                         onerror="showErrorMessage('geographic-analysis-loader', 'Failed to load geographic analysis chart')">
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h4 class="text-xl font-bold text-gray-700 mb-4 pb-3 border-b-2 border-gray-200 flex items-center">
+                    <i class="fas fa-tasks mr-3 text-primary-500"></i>Order Status & Performance Analysis
+                </h4>
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 relative">
+                    <!-- Loading Indicator -->
+                    <div id="order-status-loader" class="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-xl z-10">
+                        <div class="flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                            <p class="text-gray-600 mt-3 text-sm">Loading order status chart...</p>
+                        </div>
+                    </div>
+                    <img src="/api/charts/order-status" 
+                         class="w-full rounded-lg shadow-sm opacity-0 transition-opacity duration-300" 
+                         alt="Order Status Chart" 
+                         style="min-height: 700px; max-height: 900px;"
+                         onload="hideLoader('order-status-loader'); this.style.opacity='1';"
+                         onerror="showErrorMessage('order-status-loader', 'Failed to load order status chart')">
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-table mr-3 text-primary-500"></i>Recent Orders (First 10 Records)
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-800 text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Order #</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Customer</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Product Line</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Quantity</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Price Each</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Total Sales</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Status</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for record in data %}
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-3 text-sm">{{ record.ORDERNUMBER }}</td>
+                                <td class="px-4 py-3 text-sm">{{ record.CUSTOMERNAME }}</td>
+                                <td class="px-4 py-3 text-sm">{{ record.PRODUCTLINE }}</td>
+                                <td class="px-4 py-3 text-sm">{{ record.QUANTITYORDERED }}</td>
+                                <td class="px-4 py-3 text-sm">${{ "{:,.2f}".format(record.PRICEEACH) }}</td>
+                                <td class="px-4 py-3 text-sm font-semibold">${{ "{:,.2f}".format(record.SALES) }}</td>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                    {% if record.STATUS == 'Shipped' %}bg-green-100 text-green-800
+                                    {% elif record.STATUS == 'Processing' %}bg-yellow-100 text-yellow-800
+                                    {% elif record.STATUS == 'Disputed' %}bg-red-100 text-red-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ record.STATUS }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <a href="/edit/{{ record.ORDERNUMBER }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs font-medium mr-2 transition-colors">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button onclick="deleteRecord({{ record.ORDERNUMBER }})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-xs font-medium transition-colors">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status Summary -->
+        <div class="mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h4 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-3 text-primary-500"></i>Order Status Summary
+                </h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {% for status, count in stats.status_counts.items() %}
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span class="text-sm font-medium text-gray-700">{{ status }}</span>
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                        {% if status == 'Shipped' %}bg-green-100 text-green-800
+                        {% elif status == 'Processing' %}bg-yellow-100 text-yellow-800
+                        {% elif status == 'Disputed' %}bg-red-100 text-red-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">{{ count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-        {% for col in rows[0].keys() %}
-          <th>{{ col }}</th>
-        {% endfor %}
-        <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in rows %}
-        <tr>
-          {% for v in r.values() %}
-          <td>{{ v }}</td>
-          {% endfor %}
-          <td><a href="/edit/{{ r.id }}">Edit</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <!-- Analysis Modal -->
+    <div id="analysisModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200">
+                <h5 class="text-xl font-bold text-gray-800">Dataset Analysis Results</h5>
+                <button onclick="closeAnalysisModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[70vh]" id="analysisContent">
+                <!-- Analysis results will be loaded here -->
+            </div>
+        </div>
+    </div>
 
-<script>
-async function loadCharts(){
-  try{
-    const resp1 = await fetch('/api/chart/productline');
-    const data1 = await resp1.json();
-    const ctx1 = document.getElementById('productlineChart').getContext('2d');
-    new Chart(ctx1, {
-      type: 'pie',
-      data: {
-        labels: data1.labels,
-        datasets: [{ data: data1.values, backgroundColor: ['#4f46e5','#06b6d4','#f97316','#10b981','#ef4444','#f59e0b'] }]
-      }
-    });
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Analyze data function
+        async function analyzeData() {
+            try {
+                const response = await fetch('/api/analyze');
+                const data = await response.json();
+                
+                let content = '<div class="grid md:grid-cols-2 gap-6">';
+                
+                // Dataset Info
+                content += '<div><h6 class="text-lg font-semibold text-gray-800 mb-3">Dataset Information</h6>';
+                content += '<div class="bg-gray-50 rounded-lg p-4 space-y-2">';
+                content += `<div class="flex justify-between"><span class="text-gray-600">Records:</span><span class="font-semibold">${data.dataset_info.total_records}</span></div>`;
+                content += `<div class="flex justify-between"><span class="text-gray-600">Columns:</span><span class="font-semibold">${data.dataset_info.total_columns}</span></div>`;
+                content += `<div class="flex justify-between"><span class="text-gray-600">Memory:</span><span class="font-semibold">${data.dataset_info.memory_usage}</span></div>`;
+                content += '</div></div>';
+                
+                // Missing Values
+                content += '<div><h6 class="text-lg font-semibold text-gray-800 mb-3">Missing Values</h6>';
+                content += '<div class="bg-gray-50 rounded-lg p-4 space-y-2">';
+                for (const [col, missing] of Object.entries(data.missing_values)) {
+                    content += `<div class="flex justify-between"><span class="text-gray-600">${col}:</span><span class="font-semibold">${missing}</span></div>`;
+                }
+                content += '</div></div>';
+                
+                content += '</div>';
+                
+                document.getElementById('analysisContent').innerHTML = content;
+                document.getElementById('analysisModal').classList.remove('hidden');
+                document.getElementById('analysisModal').classList.add('flex');
+            } catch (error) {
+                alert('Error analyzing data: ' + error.message);
+            }
+        }
 
-    const resp2 = await fetch('/api/chart/sales_over_time');
-    const data2 = await resp2.json();
-    const ctx2 = document.getElementById('salesTimeChart').getContext('2d');
-    new Chart(ctx2, {
-      type: 'line',
-      data: {
-        labels: data2.labels,
-        datasets: [{ label: 'Sales', data: data2.values, borderColor: '#111827', backgroundColor: 'rgba(17,24,39,0.05)' }]
-      },
-      options: { scales: { x: { display: true }, y: { display: true } } }
-    });
-  }catch(e){
-    console.error('Failed to load charts', e);
-  }
-}
-window.addEventListener('load', loadCharts);
-</script>
+        // Close analysis modal
+        function closeAnalysisModal() {
+            document.getElementById('analysisModal').classList.add('hidden');
+            document.getElementById('analysisModal').classList.remove('flex');
+        }
+
+        // Delete record function
+        async function deleteRecord(id) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                try {
+                    const response = await fetch(`/api/data/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('Error deleting record');
+                    }
+                } catch (error) {
+                    alert('Error deleting record: ' + error.message);
+                }
+            }
+        }
+
+        // Chart loading indicator functions
+        function hideLoader(loaderId) {
+            const loader = document.getElementById(loaderId);
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        function showErrorMessage(loaderId, errorMessage) {
+            const loader = document.getElementById(loaderId);
+            if (loader) {
+                loader.innerHTML = `
+                    <div class="flex flex-col items-center">
+                        <div class="text-red-500 text-4xl mb-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <p class="text-red-600 text-sm text-center">${errorMessage}</p>
+                        <button onclick="location.reload()" class="mt-3 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                            <i class="fas fa-refresh mr-1"></i>Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Show loading state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add a small delay to show loading indicators even for fast-loading charts
+            const loaders = ['sales-trends-loader', 'product-analysis-loader', 'geographic-analysis-loader', 'order-status-loader'];
+            loaders.forEach(loaderId => {
+                const loader = document.getElementById(loaderId);
+                if (loader) {
+                    loader.style.display = 'flex';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
