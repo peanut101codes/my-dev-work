@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Automobile Order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#667eea',
+                        'secondary': '#764ba2'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-gradient-to-r from-primary to-secondary shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="/" class="flex items-center text-white text-xl font-bold hover:text-gray-200 transition duration-200">
+                    <i class="fas fa-car mr-2"></i>
+                    Automobile Sales Analytics
+                </a>
+                <div class="flex space-x-6">
+                    <a href="/" class="text-white hover:text-gray-200 flex items-center transition duration-200">
+                        <i class="fas fa-home mr-1"></i>
+                        Home
+                    </a>
+                    <a href="/add" class="text-white hover:text-gray-200 flex items-center transition duration-200">
+                        <i class="fas fa-plus mr-1"></i>
+                        Add Record
+                    </a>
+                    <a href="/data_cleaning" class="text-white hover:text-gray-200 flex items-center transition duration-200">
+                        <i class="fas fa-broom mr-1"></i>
+                        Data Cleaning
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-2xl shadow-lg p-8 transform hover:shadow-xl transition duration-300">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8 flex items-center justify-center">
+                <i class="fas fa-edit mr-3 text-primary"></i>
+                Edit Automobile Order #{{ record.ORDERNUMBER }}
+            </h2>
+            
+            <form id="editForm" class="space-y-6">
+                <!-- Row 1: Order Number and Customer Name -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="ordernumber" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-hashtag mr-2 text-primary"></i>Order Number
+                        </label>
+                        <input type="number" id="ordernumber" name="ordernumber" value="{{ record.ORDERNUMBER }}" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                    </div>
+                    <div>
+                        <label for="customername" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-user mr-2 text-primary"></i>Customer Name
+                        </label>
+                        <input type="text" id="customername" name="customername" value="{{ record.CUSTOMERNAME }}" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                    </div>
+                </div>
+                
+                <!-- Row 2: Product Line and Quantity -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="productline" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-box mr-2 text-primary"></i>Product Line
+                        </label>
+                        <select id="productline" name="productline" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                            <option value="">Select Product Line</option>
+                            <option value="Motorcycles" {% if record.PRODUCTLINE == "Motorcycles" %}selected{% endif %}>Motorcycles</option>
+                            <option value="Classic Cars" {% if record.PRODUCTLINE == "Classic Cars" %}selected{% endif %}>Classic Cars</option>
+                            <option value="Trucks" {% if record.PRODUCTLINE == "Trucks" %}selected{% endif %}>Trucks</option>
+                            <option value="Vintage Cars" {% if record.PRODUCTLINE == "Vintage Cars" %}selected{% endif %}>Vintage Cars</option>
+                            <option value="Planes" {% if record.PRODUCTLINE == "Planes" %}selected{% endif %}>Planes</option>
+                            <option value="Ships" {% if record.PRODUCTLINE == "Ships" %}selected{% endif %}>Ships</option>
+                            <option value="Trains" {% if record.PRODUCTLINE == "Trains" %}selected{% endif %}>Trains</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="quantityordered" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-sort-numeric-up mr-2 text-primary"></i>Quantity Ordered
+                        </label>
+                        <input type="number" id="quantityordered" name="quantityordered" value="{{ record.QUANTITYORDERED }}" min="1" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                    </div>
+                </div>
+                
+                <!-- Row 3: Price and Total Sales -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="priceeach" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-dollar-sign mr-2 text-primary"></i>Price Each
+                        </label>
+                        <input type="number" id="priceeach" name="priceeach" value="{{ record.PRICEEACH }}" step="0.01" min="0" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                    </div>
+                    <div>
+                        <label for="sales" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-calculator mr-2 text-primary"></i>Total Sales
+                        </label>
+                        <input type="number" id="sales" name="sales" value="{{ record.SALES }}" step="0.01" min="0" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 bg-gray-50">
+                    </div>
+                </div>
+                
+                <!-- Row 4: Order Date and Status -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="orderdate" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-calendar mr-2 text-primary"></i>Order Date
+                        </label>
+                        <input type="date" id="orderdate" name="orderdate" value="{{ record.ORDERDATE }}" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                    </div>
+                    <div>
+                        <label for="status" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-info-circle mr-2 text-primary"></i>Status
+                        </label>
+                        <select id="status" name="status" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                            <option value="">Select Status</option>
+                            <option value="Shipped" {% if record.STATUS == "Shipped" %}selected{% endif %}>Shipped</option>
+                            <option value="Processing" {% if record.STATUS == "Processing" %}selected{% endif %}>Processing</option>
+                            <option value="Disputed" {% if record.STATUS == "Disputed" %}selected{% endif %}>Disputed</option>
+                            <option value="Cancelled" {% if record.STATUS == "Cancelled" %}selected{% endif %}>Cancelled</option>
+                            <option value="On Hold" {% if record.STATUS == "On Hold" %}selected{% endif %}>On Hold</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Row 5: Phone and City -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-phone mr-2 text-primary"></i>Phone
+                        </label>
+                        <input type="tel" id="phone" name="phone" value="{{ record.PHONE }}" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                    </div>
+                    <div>
+                        <label for="city" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-city mr-2 text-primary"></i>City
+                        </label>
+                        <input type="text" id="city" name="city" value="{{ record.CITY }}" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                    </div>
+                </div>
+                
+                <!-- Row 6: Country and Deal Size -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="country" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-globe mr-2 text-primary"></i>Country
+                        </label>
+                        <input type="text" id="country" name="country" value="{{ record.COUNTRY }}" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                    </div>
+                    <div>
+                        <label for="dealsize" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-chart-bar mr-2 text-primary"></i>Deal Size
+                        </label>
+                        <select id="dealsize" name="dealsize" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200">
+                            <option value="">Select Deal Size</option>
+                            <option value="Small" {% if record.DEALSIZE == "Small" %}selected{% endif %}>Small</option>
+                            <option value="Medium" {% if record.DEALSIZE == "Medium" %}selected{% endif %}>Medium</option>
+                            <option value="Large" {% if record.DEALSIZE == "Large" %}selected{% endif %}>Large</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="flex justify-center space-x-4 pt-6">
+                    <button type="submit" 
+                            class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center">
+                        <i class="fas fa-save mr-2"></i>Update Order
+                    </button>
+                    <a href="/" 
+                       class="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-3 rounded-full font-semibold transition duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-2xl bg-white">
+            <div class="bg-green-500 text-white p-4 rounded-t-2xl flex items-center justify-between">
+                <h5 class="text-lg font-bold flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>Success
+                </h5>
+                <button onclick="closeModal()" class="text-white hover:text-gray-200 text-xl font-bold">×</button>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-700 mb-6">Automobile order has been updated successfully!</p>
+                <div class="flex justify-end">
+                    <a href="/" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-200">
+                        Go to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="priceeach" class="form-label">
+                                        <i class="fas fa-dollar-sign me-1"></i>Price Each
+                                    </label>
+                                    <input type="number" class="form-control" id="priceeach" name="priceeach" value="{{ record.PRICEEACH }}" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="sales" class="form-label">
+                                        <i class="fas fa-calculator me-1"></i>Total Sales
+                                    </label>
+                                    <input type="number" class="form-control" id="sales" name="sales" value="{{ record.SALES }}" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="orderdate" class="form-label">
+                                        <i class="fas fa-calendar me-1"></i>Order Date
+                                    </label>
+                                    <input type="date" class="form-control" id="orderdate" name="orderdate" value="{{ record.ORDERDATE.strftime('%Y-%m-%d') if record.ORDERDATE else '' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">
+                                        <i class="fas fa-info-circle me-1"></i>Status
+                                    </label>
+                                    <select class="form-control" id="status" name="status" required>
+                                        <option value="">Select Status</option>
+                                        <option value="Shipped" {% if record.STATUS == "Shipped" %}selected{% endif %}>Shipped</option>
+                                        <option value="Processing" {% if record.STATUS == "Processing" %}selected{% endif %}>Processing</option>
+                                        <option value="Disputed" {% if record.STATUS == "Disputed" %}selected{% endif %}>Disputed</option>
+                                        <option value="Cancelled" {% if record.STATUS == "Cancelled" %}selected{% endif %}>Cancelled</option>
+                                        <option value="On Hold" {% if record.STATUS == "On Hold" %}selected{% endif %}>On Hold</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">
+                                        <i class="fas fa-phone me-1"></i>Phone
+                                    </label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ record.PHONE }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="city" class="form-label">
+                                        <i class="fas fa-city me-1"></i>City
+                                    </label>
+                                    <input type="text" class="form-control" id="city" name="city" value="{{ record.CITY }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="country" class="form-label">
+                                        <i class="fas fa-globe me-1"></i>Country
+                                    </label>
+                                    <input type="text" class="form-control" id="country" name="country" value="{{ record.COUNTRY }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dealsize" class="form-label">
+                                        <i class="fas fa-chart-bar me-1"></i>Deal Size
+                                    </label>
+                                    <select class="form-control" id="dealsize" name="dealsize" required>
+                                        <option value="">Select Deal Size</option>
+                                        <option value="Small" {% if record.DEALSIZE == "Small" %}selected{% endif %}>Small</option>
+                                        <option value="Medium" {% if record.DEALSIZE == "Medium" %}selected{% endif %}>Medium</option>
+                                        <option value="Large" {% if record.DEALSIZE == "Large" %}selected{% endif %}>Large</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-custom me-2">
+                                <i class="fas fa-save me-1"></i>Update Record
+                            </button>
+                            <a href="/" class="btn btn-secondary btn-custom">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-calculate total sales when quantity or price changes
+        function calculateTotalSales() {
+            const quantity = parseFloat(document.getElementById('quantityordered').value) || 0;
+            const price = parseFloat(document.getElementById('priceeach').value) || 0;
+            const total = quantity * price;
+            document.getElementById('sales').value = total.toFixed(2);
+        }
+
+        // Modal functions
+        function showModal() {
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        document.getElementById('quantityordered').addEventListener('input', calculateTotalSales);
+        document.getElementById('priceeach').addEventListener('input', calculateTotalSales);
+
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('/api/data/{{ record.ORDERNUMBER }}', {
+                    method: 'PUT',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    // Show success modal
+                    showModal();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.detail);
+                }
+            } catch (error) {
+                alert('Error updating automobile order: ' + error.message);
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
