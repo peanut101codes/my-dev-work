@@ -1,12 +1,3 @@
-/*
-Copyright 2022 Adobe
-All Rights Reserved.
-
-NOTICE: Adobe permits you to use, modify, and distribute this file in
-accordance with the terms of the Adobe license agreement accompanying
-it.
-*/
-
 // Use the AEM Headless SDK to make the GraphQL requests
 import AEMHeadless from "@adobe/aem-headless-client-js";
 
